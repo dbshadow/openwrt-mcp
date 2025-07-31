@@ -17,9 +17,9 @@ RUN apt-get update && apt-get install -y curl && \
 
 # 將您的應用程式程式碼複製到工作目錄
 COPY openwrt.py .
-
+@
 # 開放您應用程式運行的 port
-EXPOSE 8181
+EXPOSE 8444
 
 # 設定容器啟動時執行的命令
 CMD ["python", "./openwrt.py"]
