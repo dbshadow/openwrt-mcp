@@ -1,6 +1,6 @@
 # OpenWrt MCP Server
 
-This project provides a Management and Control Plane (MCP) server for managing OpenWrt devices. It allows you to interact with and control an OpenWrt router through a simple API, either by running a Python script directly or by deploying it as a Docker container.
+This project provides a Model Context Protocol (MCP) server for managing OpenWrt devices. It allows you to interact with and control an OpenWrt router through a simple API, either by running a Python script directly or by deploying it as a Docker container.
 
 The server utilizes `fastmcp` to expose OpenWrt functionalities as tools that can be called remotely. It also includes a custom LuCI JSON-RPC script (`sys.lua`) to add extra capabilities to the standard OpenWrt RPC interface.
 
