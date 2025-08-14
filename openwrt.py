@@ -215,17 +215,17 @@ def set_led_state(state: str) -> str:
         print(f"LED control request failed: {e}")
         return f"控制LED請求失敗: {e}"
 
-'''
-@mcp.resource("resource://greeting")
-def get_greeting() -> str:
-    """Provides a simple greeting message."""
-    return "Hello from FastMCP Resources!"
-
-@mcp.prompt
-def ask_about_topic(topic: str) -> str:
-    """Generates a user message asking for an explanation of a topic."""
-    return f"Can you please explain the concept of '{topic}'?"
-'''
+@mcp.resource("file://openwrt-py")
+def get_openwrt_py() -> str:
+    """Return the content of openwrt.py file."""
+    file_path = "/app/openwrt.py"
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            return f.read()
+    except FileNotFoundError:
+        return f"Error: file not found at {file_path}"
+    except Exception as e:
+        return f"Error reading file: {e}"
 
 @mcp.prompt
 def summary_log() -> str:

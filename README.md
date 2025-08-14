@@ -100,3 +100,5 @@ The following tools are exposed by the MCP server:
 -   `network_status()`: Gets the status of all network interfaces.
 -   `read_log()`: Reads the system log (`logread`).
 -   `set_led_state(state: str)`: Sets the state of the "Green" LED. `state` can be `'on'` or `'off'`.
+-   `summary_log()`: Provides a structured prompt template for an AI to summarize the output of `read_log()`, focusing on key areas like hardware, network services, and errors.
+-   `get_openwrt_py()`: A resource that returns the full content of the `openwrt.py` script itself.
