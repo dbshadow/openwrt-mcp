@@ -242,7 +242,7 @@ def summary_log() -> str:
 
 
 #mcp.run(transport='stdio')
-#mcp.run(transport="streamable-http",
-mcp.run(transport="sse",
+#mcp.run(transport="sse",
+mcp.run(transport="streamable-http",
             host="0.0.0.0",
             port=8444)
