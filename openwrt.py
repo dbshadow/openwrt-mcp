@@ -13,8 +13,8 @@ rpc_base_url = f"{openwrt_host}/cgi-bin/luci/rpc"
 
 def _login() -> str | None:
     """
-    登入 OpenWrt 並回傳 token。
-    登入失敗則回傳 None。
+    Login to OpenWrt and return token.
+    Returns None if login fails.
     """
     auth_url = f"{rpc_base_url}/auth"
     payload = {
@@ -43,11 +43,11 @@ def _login() -> str | None:
 def reboot() -> str:
     """
     Reboot OpenWRT.
-    會自動先登入取得Token再執行重開機。
+    Automatically logs in to get token before executing reboot.
     """
     token = _login()
     if not token:
-        return "登入失敗，無法執行重開機。"
+        return "Login failed, unable to execute reboot."
 
     sys_url = f"{rpc_base_url}/sys"
     payload = {
@@ -63,24 +63,24 @@ def reboot() -> str:
         data = resp.json()
 
         if data.get("error") is None:
-            res = "重開機已完成."
+            res = "Reboot completed."
         else:
-            res = f"重開機失敗: {data.get('error')}"
+            res = f"Reboot failed: {data.get('error')}"
         return res
     except requests.exceptions.RequestException as e:
         print(f"Reboot request failed: {e}")
-        return f"重開機請求失敗: {e}"
+        return f"Reboot request failed: {e}"
 
 
 @mcp.tool()
 def system_status() -> str:
     """
-    取得OpenWRT的系統狀態。
-    會自動先登入取得Token再執行。
+    Get OpenWRT system status.
+    Automatically logs in to get token before execution.
     """
     token = _login()
     if not token:
-        return "登入失敗，無法取得版本狀態。"
+        return "Login failed, unable to get system status."
 
     sys_url = f"{rpc_base_url}/sys"
     payload = {
@@ -99,21 +99,21 @@ def system_status() -> str:
             res = data["result"]
             print(res)
         else:
-            res = f"取得狀態失敗: {data.get('error')}"
+            res = f"Failed to get status: {data.get('error')}"
         return str(res)
     except requests.exceptions.RequestException as e:
         print(f"Version status request failed: {e}")
-        return f"取得狀態請求失敗: {e}"
+        return f"Status request failed: {e}"
 
 @mcp.tool()
 def network_status() -> str:
     """
-    取得OpenWRT所有網路介面的狀態。
-    會自動先登入取得Token再執行。
+    Get status of all OpenWRT network interfaces.
+    Automatically logs in to get token before execution.
     """
     token = _login()
     if not token:
-        return "登入失敗，無法取得網路狀態。"
+        return "Login failed, unable to get network status."
 
     sys_url = f"{rpc_base_url}/sys"
     payload = {
@@ -132,21 +132,21 @@ def network_status() -> str:
             res = data["result"]
             print(res)
         else:
-            res = f"取得狀態失敗: {data.get('error')}"
+            res = f"Failed to get status: {data.get('error')}"
         return str(res)
     except requests.exceptions.RequestException as e:
         print(f"Network status request failed: {e}")
-        return f"取得狀態請求失敗: {e}"
+        return f"Status request failed: {e}"
 
 @mcp.tool()
 def read_log() -> str:
     """
-    讀取OpenWRT的系統日誌 (logread)。
-    會自動先登入取得Token再執行。
+    Read OpenWRT system log (logread).
+    Automatically logs in to get token before execution.
     """
     token = _login()
     if not token:
-        return "登入失敗，無法讀取日誌。"
+        return "Login failed, unable to read log."
 
     sys_url = f"{rpc_base_url}/sys"
     payload = {
@@ -164,30 +164,30 @@ def read_log() -> str:
         if "result" in data and data.get("error") is None:
             res = data["result"]
         else:
-            res = f"讀取日誌失敗: {data.get('error')}"
+            res = f"Failed to read log: {data.get('error')}"
         return str(res)
     except requests.exceptions.RequestException as e:
         print(f"Log read request failed: {e}")
-        return f"讀取日誌請求失敗: {e}"
+        return f"Log read request failed: {e}"
 
 @mcp.tool()
 def set_led_state(state: str) -> str:
     """
-    控制 Green LED 燈亮起或熄滅。
-    state: 'on' 或 'off'
+    Control Green LED on or off.
+    state: 'on' or 'off'
     """
     token = _login()
     if not token:
-        return "登入失敗，無法控制LED。"
+        return "Login failed, unable to control LED."
 
-    name = "Green" # 固定LED名稱
+    name = "Green" # Fixed LED name
 
-    # 將 'on'/'off' 狀態轉換為對應的 trigger 值
+    # Convert 'on'/'off' state to corresponding trigger value
     trigger = "none"
     if state == "on":
         trigger = "default-on"
     elif state != "off":
-        return "無效的狀態，請使用 'on' 或 'off'。"
+        return "Invalid state, please use 'on' or 'off'."
 
     sys_url = f"{rpc_base_url}/sys"
     payload = {
@@ -205,15 +205,15 @@ def set_led_state(state: str) -> str:
         if "result" in data and data.get("error") is None:
             result = data["result"]
             if result.get("success"):
-                res = f"成功將LED '{name}' 的狀態設為 {state}。"
+                res = f"Successfully set LED '{name}' state to {state}."
             else:
-                res = f"設定LED失敗: {result.get('error')}"
+                res = f"Failed to set LED: {result.get('error')}"
         else:
-            res = f"控制LED失敗: {data.get('error')}"
+            res = f"Failed to control LED: {data.get('error')}"
         return res
     except requests.exceptions.RequestException as e:
         print(f"LED control request failed: {e}")
-        return f"控制LED請求失敗: {e}"
+        return f"LED control request failed: {e}"
 
 @mcp.resource("file://openwrt-py")
 def get_openwrt_py() -> str:
@@ -229,20 +229,21 @@ def get_openwrt_py() -> str:
 
 @mcp.prompt
 def summary_log() -> str:
-    """針對工具read_log取得的log，產生一個有條理的格式供AI總結。"""
-    summary="\
-    1. **「核心與硬體狀態」**: 幫我找出所有與 OpenWRT 核心啟動、驅動程式、CPU、記憶體、PCIe、USB 或網路硬體相關的資訊，特別留意任何 `warn` 或 `err` 等錯誤訊息。這類日誌通常以 `kern.info kernel:`, `kern.warn kernel:`, `kern.err kernel:` 開頭。\n\
-        **例如：** `Booting Linux`, `Memory:`, `CPU features:`, `PCIe`, `USB`, `eth`, `mtk-`, `failed to get`.\n\
-    2. **「網路服務診斷」**: 幫我分析所有與網路服務（如 DHCP、DNS）、網路介面狀態（例如 WAN/LAN 連線狀態）或防火牆設定變更有關的日誌。這類日誌通常來自 `netifd`, `dnsmasq`, `firewall`, `udhcpc` 等服務。\n\
-        **例如：** `netifd: Interface 'wan' is now up`, `dnsmasq: started`, `udhcpc: lease of ... obtained`, `firewall: Reloading firewall`.\n\
-    3. **「應用程式事件」**: 幫我列出除了核心和網路服務之外，其他應用程式或系統進程（例如 `procd`, `kmodloader`, `collectd`, `sshd`）的啟動、停止或異常記錄。這類日誌通常來自使用者空間的應用程式。\n\
-        **例如：** `init: Console is alive`, `kmodloader: loading kernel modules`, `collectd: Initialization complete`, `sshd: Server listening`.\n\
-    4. **「所有異常報告」**: 獨立列出所有日誌中包含 `warn` 或 `err` 關鍵字的訊息，並簡要說明其可能的含義，讓我能快速掌握問題點。"
-    return f"使用工具讀取openwrt的log以後，再依照下面的格式總結log的重點：\n{summary}"
+    """Generate a structured format for AI to summarize logs obtained from the read_log tool."""
+    summary="""\
+    1. **"Kernel and Hardware Status"**: Help me find all information related to OpenWRT kernel boot, drivers, CPU, memory, PCIe, USB, or network hardware, paying special attention to any `warn` or `err` error messages. These logs typically start with `kern.info kernel:`, `kern.warn kernel:`, `kern.err kernel:`.\n\
+        **Examples:** `Booting Linux`, `Memory:`, `CPU features:`, `PCIe`, `USB`, `eth`, `mtk-`, `failed to get`.\n\
+    2. **"Network Service Diagnostics"**: Help me analyze all logs related to network services (such as DHCP, DNS), network interface status (e.g., WAN/LAN connection status), or firewall configuration changes. These logs typically come from services like `netifd`, `dnsmasq`, `firewall`, `udhcpc`.\n\
+        **Examples:** `netifd: Interface 'wan' is now up`, `dnsmasq: started`, `udhcpc: lease of ... obtained`, `firewall: Reloading firewall`.\n\
+    3. **"Application Events"**: Help me list startup, shutdown, or abnormal records of other applications or system processes (such as `procd`, `kmodloader`, `collectd`, `sshd`) besides kernel and network services. These logs typically come from user-space applications.\n\
+        **Examples:** `init: Console is alive`, `kmodloader: loading kernel modules`, `collectd: Initialization complete`, `sshd: Server listening`.\n\
+    4. **"All Exception Reports"**: Separately list all messages in the logs containing `warn` or `err` keywords, and briefly explain their possible meanings, allowing me to quickly grasp problem points.
+    """
+    return f"After using the tool to read OpenWRT logs, summarize the key points of the logs according to the following format:{summary}\n"
 
 
 #mcp.run(transport='stdio')
 #mcp.run(transport="sse",
 mcp.run(transport="streamable-http",
-            host="0.0.0.0",
+            host="127.0.0.1",
             port=8444)
