@@ -2,13 +2,21 @@
 from fastmcp import FastMCP
 import requests
 import sys
+import os
 
 # Create an MCP server
 mcp = FastMCP("OpenWrt Controller")
 
-username="root"
-password="1234asdf"
-openwrt_host="http://192.168.7.153"
+# Load configuration from environment variables
+username = os.getenv("OPENWRT_USERNAME", "root")
+password = os.getenv("OPENWRT_PASSWORD")
+openwrt_host = os.getenv("OPENWRT_HOST")
+
+# Validate that required environment variables are set
+if not all([password, openwrt_host]):
+    print("Error: Missing required environment variables.")
+    print("Please set OPENWRT_PASSWORD and OPENWRT_HOST.")
+    sys.exit(1)
 rpc_base_url = f"{openwrt_host}/cgi-bin/luci/rpc"
 
 def _login() -> str | None:
@@ -215,18 +223,6 @@ def set_led_state(state: str) -> str:
         print(f"LED control request failed: {e}")
         return f"控制LED請求失敗: {e}"
 
-@mcp.resource("file://openwrt-py")
-def get_openwrt_py() -> str:
-    """Return the content of openwrt.py file."""
-    file_path = "/app/openwrt.py"
-    try:
-        with open(file_path, "r", encoding="utf-8") as f:
-            return f.read()
-    except FileNotFoundError:
-        return f"Error: file not found at {file_path}"
-    except Exception as e:
-        return f"Error reading file: {e}"
-
 @mcp.prompt
 def summary_log() -> str:
     """針對工具read_log取得的log，產生一個有條理的格式供AI總結。"""
@@ -241,8 +237,15 @@ def summary_log() -> str:
     return f"使用工具讀取openwrt的log以後，再依照下面的格式總結log的重點：\n{summary}"
 
 
-#mcp.run(transport='stdio')
-#mcp.run(transport="sse",
-mcp.run(transport="streamable-http",
-            host="0.0.0.0",
-            port=8444)
+def main():
+    """
+    Main function to run the MCP server.
+    """
+    mcp.run(transport='stdio')
+    #mcp.run(transport="sse",
+    #mcp.run(transport="streamable-http",
+    #            host="0.0.0.0",
+    #            port=8444)
+
+if __name__ == "__main__":
+    main()

@@ -1,10 +1,17 @@
 [project]
 name = "openwrt-mcp"
-version = "0.1.0"
-description = "Add your description here"
+version = "0.1.7"
+description = "A MCP server for OpenWrt devices. This is a very early version and may contain unexpected errors."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "fastmcp>=2.10.6",
     "requests>=2.32.4",
 ]
+
+[project.scripts]
+openwrt-mcp = "openwrt_mcp.openwrt:main"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
